@@ -1,7 +1,9 @@
 import { InkbrushParams, generateInkbrush, vector } from 'inkbrush'
-import { KoiPhoneme, PrimaryWrittenGroup } from '../types'
+import { KoiPhoneme, PrimaryWrittenGroup, writtenGrouping } from '../types'
 import { Coord } from 'inkbrush/lib/vector'
 import { shorthandStandard } from './standard/shorthandFontStandard'
+import { find2D } from '../utils/find2D'
+import { rotate } from '../utils/radians'
 
 export enum ShorthandFontType {
   Standard = 'standard'
@@ -50,28 +52,83 @@ export interface PrimaryShorthandFont {
      */
     begin: Coord
     /**
-     * A normal vector indicating the orientation of the form marks (relative to begin)
+     * The rotation measured in radians of the form marks
      */
-    orientation: Coord
+    rotation: number
+    /**
+     * The size of the form marks.
+     * This is a multiplier of the base size of the phoneme.
+     * This number should likely be around 0.1 since a value of 1 would make it as large as the phoneme itself.
+     */
+    size: number
   }
 }
 
 export interface ShorthandFont {
   /**
-   * All of the information for the primary written groups
+   * All of the information for the primary written groups.
+   * Ensure the order is the same as the writtenGrouping 2D array.
    */
   primaries: Record<PrimaryWrittenGroup, PrimaryShorthandFont>
   /**
    * The curves for each form mark to be placed primary written group.
-   * These curves should be centered at (0, 0) with the bounding box of the curves being 1x1.
+   * These curves should start at (0, 0) with the bounding box of the curves being 1x1.
    * The orientation should be in the positive X direction and will get rotated later.
    */
   formMarks: [Curve[], Curve[], Curve[], Curve[]]
 }
 
+/**
+ * @param phonemes - The phonemes to generate curves for
+ * @param fontType - The font type to use to generate the curves
+ * @returns The curves for the phonemes
+ */
 export const generateCurves = (phonemes: KoiPhoneme[][], fontType?: ShorthandFontType): Curve[] => {
   const font = getFont(fontType)
-  return font.primaries.m.baseCurves
+  const phonemeInformation = phonemes.map(word => word.map(getPhonemeInformation))
+  return phonemeInformation.map(word => generateWordCurves(word, font)).flat()
+}
+
+/**
+ * @param wordInformation - The word information to generate curves for
+ * @param font - The font to use to generate the curves
+ * @returns The curves for the word
+ */
+const generateWordCurves = (wordInformation: PhonemeInformation[], font: ShorthandFont): Curve[] => {
+  const primaries = Object.values(font.primaries)
+  return wordInformation.map(character => {
+    const primary = primaries[character.primaryGroup]
+    const formMarks = font.formMarks[character.form]
+
+    // Rotate, scale, and translate the form marks to fit the phoneme
+    const rotatedFormMarks = formMarks.map(c => ({
+      ...c,
+      curve: c.curve.map(p => vector.add(rotate(vector.scale(p, primary.form.size), primary.form.rotation), primary.form.begin))
+    }))
+
+    return [...primary.baseCurves, ...rotatedFormMarks]
+  }).flat()
+}
+
+interface PhonemeInformation { 
+  primaryGroup: number
+  form: number
+  isVowel: boolean
+}
+
+/**
+ * @param phoneme - The phoneme to get information for
+ * @returns The primary group, form, and if the phoneme is a vowel
+ */
+const getPhonemeInformation = (phoneme: KoiPhoneme): PhonemeInformation => {
+  const indexes = find2D(writtenGrouping, phoneme)
+  if (!indexes) throw new Error(`Phoneme ${phoneme} not found in writtenGrouping`)
+
+  return {
+    primaryGroup: indexes[0],
+    form: indexes[1],
+    isVowel: indexes[0] >= writtenGrouping.length - 3
+  }
 }
 
 const getFont = (fontType?: ShorthandFontType): ShorthandFont => {
