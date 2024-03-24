@@ -1,6 +1,6 @@
 {
   "name": "koilang",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "translating koilang (tsevhu)",
   "main": "lib/index.js",
   "files": [
@@ -45,5 +45,8 @@
     "ignore": [
       "examples"
     ]
+  },
+  "dependencies": {
+    "inkbrush": "^1.2.5"
   }
 }
