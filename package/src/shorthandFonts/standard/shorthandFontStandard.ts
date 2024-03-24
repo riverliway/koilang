@@ -3,10 +3,10 @@ import { Curve, PrimaryShorthandFont, ShorthandFont } from '../shorthandFonts'
 import { KoiPhoneme } from '../../types'
 import { radians } from '../../utils/radians'
 
-const generatePrimaryM = (): PrimaryShorthandFont => {
-  const startingWidth = vector.distance({ x: 0.0116, y: 0.3679 }, { x: 0.0138, y: 0.3718 })
-  const middleWidth = vector.distance({ x: 0.2702, y: 0.4415 }, { x: 0.2614, y: 0.4461 }) * 2
+const startingWidth = vector.distance({ x: 0.0116, y: 0.3679 }, { x: 0.0138, y: 0.3718 })
+const middleWidth = vector.distance({ x: 0.2702, y: 0.4415 }, { x: 0.2614, y: 0.4461 }) * 2
 
+const generatePrimaryM = (): PrimaryShorthandFont => {
   return {
     baseCurves: [{
       curve: [
@@ -68,6 +68,44 @@ const generatePrimaryM = (): PrimaryShorthandFont => {
     form: {
       begin: { x: 0.0203, y: 0.7266 },
       rotation: radians(150),
+      size: 0.1
+    }
+  }
+}
+
+const generatePrimaryT = (): PrimaryShorthandFont => {
+  return {
+    baseCurves: [{
+      curve: [
+        { x: 0.2316, y: 0.34 },
+        { x: 0.0455, y: 0.5 },
+        { x: 0.1863, y: 0.6559 },
+        { x: 0.5, y: 0.6666 },
+        { x: 0.8158, y: 0.6581 },
+        { x: 0.9623, y: 0.5 },
+        { x: 0.7785, y: 0.34 }
+      ],
+      bend: -7.4 / 19.8 * 2,
+      strokeWidths: [{
+        breakpoint: 0,
+        strokeWidth: startingWidth
+      }, {
+        breakpoint: 0.5,
+        strokeWidth: middleWidth
+      }, {
+        breakpoint: 1,
+        strokeWidth: startingWidth
+      }]
+    }],
+    consonant: {
+      canFirstConnect: false,
+      canLastConnect: false,
+      leadingVowelPosition: { x: 0.1268, y: 0.3333 / 2 },
+      trailingVowelPosition: { x: 0.8338, y: 0.3333 / 2 }
+    },
+    form: {
+      begin: { x: 0.0203, y: 0.7266 },
+      rotation: radians(130),
       size: 0.1
     }
   }
@@ -143,7 +181,8 @@ const generateFourthFormMark = (): Curve[] => {
  */
 export const shorthandStandard = {
   primaries: {
-    [KoiPhoneme.m]: generatePrimaryM()
+    [KoiPhoneme.m]: generatePrimaryM(),
+    [KoiPhoneme.t]: generatePrimaryT(),
   },
   formMarks: [
     [] as Curve[],

@@ -4,6 +4,7 @@ import { Coord } from 'inkbrush/lib/vector'
 import { shorthandStandard } from './standard/shorthandFontStandard'
 import { find2D } from '../utils/find2D'
 import { rotate } from '../utils/radians'
+import { cummap } from '../utils/cummap'
 
 export enum ShorthandFontType {
   Standard = 'standard'
@@ -86,17 +87,22 @@ export interface ShorthandFont {
 export const generateCurves = (phonemes: KoiPhoneme[][], fontType?: ShorthandFontType): Curve[] => {
   const font = getFont(fontType)
   const phonemeInformation = phonemes.map(word => word.map(getPhonemeInformation))
-  return phonemeInformation.map(word => generateWordCurves(word, font)).flat()
+
+  const lengths = cummap(phonemeInformation.map(w => w.length), (val, prevVal: number | undefined) => (prevVal ?? 0) + val)
+  const offsets = [0, ...lengths.slice(0, -1)]
+
+  return phonemeInformation.map((word, i) => generateWordCurves(word, font, offsets[i])).flat()
 }
 
 /**
  * @param wordInformation - The word information to generate curves for
  * @param font - The font to use to generate the curves
+ * @param wordOffset - The offset to place the word at
  * @returns The curves for the word
  */
-const generateWordCurves = (wordInformation: PhonemeInformation[], font: ShorthandFont): Curve[] => {
+const generateWordCurves = (wordInformation: PhonemeInformation[], font: ShorthandFont, wordOffset: number): Curve[] => {
   const primaries = Object.values(font.primaries)
-  return wordInformation.map(character => {
+  return wordInformation.map((character, index) => {
     const primary = primaries[character.primaryGroup]
     const formMarks = font.formMarks[character.form]
 
@@ -106,7 +112,10 @@ const generateWordCurves = (wordInformation: PhonemeInformation[], font: Shortha
       curve: c.curve.map(p => vector.add(rotate(vector.scale(p, primary.form.size), primary.form.rotation), primary.form.begin))
     }))
 
-    return [...primary.baseCurves, ...rotatedFormMarks]
+    return [...primary.baseCurves, ...rotatedFormMarks].map(c => ({
+      ...c,
+      curve: c.curve.map(p => vector.add(p, { x: index + wordOffset, y: 0 }))
+    }))
   }).flat()
 }
 
