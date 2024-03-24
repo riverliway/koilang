@@ -111,6 +111,61 @@ const generatePrimaryT = (): PrimaryShorthandFont => {
   }
 }
 
+const generatePrimaryK = (): PrimaryShorthandFont => {
+  return {
+    baseCurves: [{
+      curve: [
+        { x: 0.0516, y: 0.369 },
+        { x: 0.145, y: 0.3591 },
+        { x: 0.2135, y: 0.4413 },
+        { x: 0.0565, y: 0.6666 }
+      ],
+      bend: 4.45 / 20 * 2,
+      strokeWidths: [{
+        breakpoint: 0,
+        strokeWidth: startingWidth
+      }, {
+        breakpoint: 0.5,
+        strokeWidth: middleWidth * 0.9
+      }, {
+        breakpoint: 1,
+        strokeWidth: middleWidth
+      }]
+    }, {
+      curve: [
+        { x: 0.0565, y: 0.6666 },
+        { x: 0.3655, y: 0.4363 },
+        { x: 0.6782, y: 0.3333 },
+        { x: 0.88, y: 0.3939 },
+        { x: 0.9224, y: 0.5447 },
+        { x: 0.8352, y: 0.6666 }
+      ],
+      bend: 0.9 / 24.95 * 2,
+      strokeWidths: [{
+        breakpoint: 0,
+        strokeWidth: middleWidth
+      }, {
+        breakpoint: 0.5,
+        strokeWidth: middleWidth * 0.9
+      }, {
+        breakpoint: 1,
+        strokeWidth: startingWidth
+      }]
+    }],
+    consonant: {
+      canFirstConnect: false,
+      canLastConnect: false,
+      leadingVowelPosition: { x: 0.1268, y: 0.3333 / 2 },
+      trailingVowelPosition: { x: 0.8338, y: 0.3333 / 2 }
+    },
+    form: {
+      begin: { x: 0.005, y: 0.7266 },
+      rotation: radians(140),
+      size: 0.1
+    }
+  }
+}
+
 const generateSecondFormMark = (): Curve[] => {
   return [{
     curve: [
@@ -183,6 +238,7 @@ export const shorthandStandard = {
   primaries: {
     [KoiPhoneme.m]: generatePrimaryM(),
     [KoiPhoneme.t]: generatePrimaryT(),
+    [KoiPhoneme.k]: generatePrimaryK()
   },
   formMarks: [
     [] as Curve[],
