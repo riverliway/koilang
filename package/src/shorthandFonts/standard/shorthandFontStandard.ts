@@ -2,6 +2,7 @@ import { vector } from 'inkbrush'
 import { Curve, PrimaryShorthandFont, ShorthandFont } from '../shorthandFonts'
 import { KoiPhoneme } from '../../types'
 import { radians } from '../../utils/radians'
+import { orthoRatio } from '../../utils/orthoRatio'
 
 const startingWidth = vector.distance({ x: 0.0116, y: 0.3679 }, { x: 0.0138, y: 0.3718 })
 const middleWidth = vector.distance({ x: 0.2702, y: 0.4415 }, { x: 0.2614, y: 0.4461 }) * 2
@@ -170,7 +171,7 @@ const generatePrimaryPH = (): PrimaryShorthandFont => {
   return {
     baseCurves: [{
       curve: [
-        { x: 0.0825, y: 0.6666 },
+        { x: 0, y: 0.6666 },
         { x: 0.4528, y: 0.6554 },
         { x: 0.8161, y: 0.678 },
         { x: 0.9865, y: 0.772 },
@@ -182,7 +183,7 @@ const generatePrimaryPH = (): PrimaryShorthandFont => {
         breakpoint: 0,
         strokeWidth: startingWidth
       }, {
-        breakpoint: 0.5,
+        breakpoint: 0.7,
         strokeWidth: middleWidth
       }, {
         breakpoint: 1,
@@ -197,6 +198,74 @@ const generatePrimaryPH = (): PrimaryShorthandFont => {
     },
     form: {
       begin: { x: 0.64, y: 0.98 },
+      rotation: radians(150),
+      size: 0.1
+    }
+  }
+}
+
+const generatePrimaryS = (): PrimaryShorthandFont => {
+  return {
+    baseCurves: [{
+      curve: [
+        { x: 0, y: 0.6666 },
+        { x: 0.264, y: 0.6666 },
+        { x: 0.4551, y: 0.707 },
+        { x: 0.5, y: 0.8166 },
+        { x: 0.4011, y: 0.9281 }
+      ],
+      bend: 0,
+      strokeWidths: [{
+        breakpoint: 0,
+        strokeWidth: startingWidth
+      }, {
+        breakpoint: 0.5,
+        strokeWidth: middleWidth
+      }, {
+        breakpoint: 1,
+        strokeWidth: startingWidth
+      }]
+    }, {
+      curve: [
+        { x: 0.4509, y: 0.5389 },
+        { x: 0.5143, y: 0.5166 },
+        { x: 0.5518, y: 0.5694 },
+        { x: 0.5, y: 0.6666 }
+      ],
+      bend: 2 * orthoRatio({ x: 0.4755, y: 0.5095 }, { x: 0.4509, y: 0.5389 }, { x: 0.5143, y: 0.5166 }),
+      strokeWidths: [{
+        breakpoint: 0,
+        strokeWidth: startingWidth
+      }, {
+        breakpoint: 1,
+        strokeWidth: middleWidth
+      }]
+    }, {
+      curve: [
+        { x: 0.5, y: 0.6666 },
+        { x: 0.75, y: 0.6666 },
+        { x: 1, y: 0.6666 }
+      ],
+      bend: 0,
+      strokeWidths: [{
+        breakpoint: 0,
+        strokeWidth: middleWidth
+      }, {
+        breakpoint: 0.5,
+        strokeWidth: middleWidth * 0.9
+      }, {
+        breakpoint: 1,
+        strokeWidth: startingWidth
+      }]
+    }],
+    consonant: {
+      canFirstConnect: true,
+      canLastConnect: true,
+      leadingVowelPosition: { x: 0.1268, y: 0.3333 / 2 },
+      trailingVowelPosition: { x: 0.8338, y: 0.3333 / 2 }
+    },
+    form: {
+      begin: { x: 0.32, y: 0.98 },
       rotation: radians(150),
       size: 0.1
     }
@@ -276,7 +345,8 @@ export const shorthandStandard = {
     [KoiPhoneme.m]: generatePrimaryM(),
     [KoiPhoneme.t]: generatePrimaryT(),
     [KoiPhoneme.k]: generatePrimaryK(),
-    [KoiPhoneme.ɸ]: generatePrimaryPH()
+    [KoiPhoneme.ɸ]: generatePrimaryPH(),
+    [KoiPhoneme.s]: generatePrimaryS()
   },
   formMarks: [
     [] as Curve[],

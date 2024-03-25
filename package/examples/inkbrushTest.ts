@@ -10,7 +10,7 @@ const test = (): void => {
   }
 
   const paths = shorthand.draw({
-    phonemes: translate.romanToPhoneticSeparated('phvhfv'),
+    phonemes: translate.romanToPhoneticSeparated('sshchz'),
     fontHeight: 100,
     offset: { x: 100, y: 100 }
   })
